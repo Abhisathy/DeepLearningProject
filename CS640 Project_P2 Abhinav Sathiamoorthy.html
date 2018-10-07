@@ -1,0 +1,164 @@
+
+<html>
+<head>
+<title>CS640 Project: P2 Abhinav Sathiamoorthy (U13420091)</title>
+<style>
+<!--
+body{
+font-family: 'Trebuchet MS', Verdana;
+}
+p{
+font-family: 'Trebuchet MS', Times;
+margin: 10px 10px 15px 20px;  
+}
+h3{
+margin: 5px;
+}
+h2{
+margin: 10px;
+}
+h1{
+margin: 10px 0px 0px 20px;
+}
+div.main-body{
+align:center;
+margin: 30px;
+}
+hr{
+margin:20px 0px 20px 0px;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+-->
+</style>
+</head>
+
+<body>
+<center>
+<a href="http://www.bu.edu"><img border="0" src="http://www.cs.bu.edu/fac/betke/images/bu-logo.gif"
+width="119" height="120"></a>
+</center>
+
+<h1>Deep Learning/Computer Vision Project</h1>
+<p> 
+ CS 640 Project P2<br>
+ Abhinav Sathiamoorthy (U13420091)<br>
+ Gur Asees Chandok (U95489771)<br>
+04/02/2018 
+</p>
+
+<div class="main-body">
+<hr>
+<h2> Problem Definition </h2>
+<p>
+The goal of this project is to use artificial intelligence algorithms/models, e.g., neural networks, to recognize and locate objects, here, IKEA products, in images of indoor scenes from "IKEA galleries." The sample photos of objects that are known to be in the scene have been provided as guidance for our recognition system. We match as many objects as possible among the provided objects with their equivalent objects in the scene.
+</p>
+
+<hr>
+<h2> Method and Implementation </h2>
+<p>
+	<ol>
+		<li>Neural Network architecture used: We apply a single neural network to the full image. This network divides the image into regions and predicts bounding boxes and probabilities for each region. These bounding boxes are weighted by the predicted probabilities. Our model has several advantages over classifier-based systems. It looks at the whole image at test time so its predictions are informed by global context in the image. It also makes predictions with a single network evaluation unlike systems like R-CNN which require thousands for a single image. This makes it extremely fast, more than 1000x faster than R-CNN and 100x faster than Fast R-CNN.
+		</li>
+		<li> Mechanism used for training: We used pre-trained YOLO weights to train the data along with the images in the IKEA dataset by breaking them into train set and validation set in the ratio 80:20. This train set is the custom training that we perform on the pre-trained model to get better accuracy with respect to images from the IKEA dataset.
+		</li>
+	</ol> 
+</p>
+
+
+<hr>
+<h2>Experiments</h2>
+<p>
+<ol>
+	<li>Each box predicts the classes the bounding box may contain using multilabel classification. We do not use a softmax as we have found it is unnecessary for good performance, instead we simply use independent logistic classifiers. During training we use binary cross-entropy loss for the class predictions.</li>
+	<li>We use multi-scale training, lots of data augmentation and batch normalization.</li>
+	<li> Our network uses successive 3 × 3 and 1 × 1 convolutional layers. It has 53 convolutional layers</li>
+	<li>Our system predicts bounding boxes using dimension clusters as anchor boxes. The network predicts 4 coordinates for each bounding box, tx,
+ty, tw, th.</li>
+	<li>During training we use sum of squared error loss. If the ground truth for some coordinate prediction is t'* our gradient is the ground truth value (computed from the ground truth box) minus our prediction: t'* − t*.</li>
+</ol></p>
+
+
+<hr>
+<h2> Results</h2>
+
+
+<p>
+<table>
+<tr><td colspan=3><center><h3>Results</h3></center></td></tr>
+<tr>
+<table>
+<tr><td colspan=3><center><h3>Original Image and New Image(Annotated by Model)</h3></center></td></tr>
+<tr>
+  <td> <img src="kitchenscene_52.jpg" style="width:350px;height:275px;"> </td> 
+  <td> <img src="predictions.png" style="width:350px;height:275px;"> </td>
+</tr> 
+<tr>
+  <td> <img src="livingroomscene_3.jpg" style="width:350px;height:275px;"> </td> 
+  <td> <img src="predictions1.png" style="width:350px;height:275px;"> </td>
+</tr> 
+</table>
+</tr> 
+</table>
+</p>
+
+
+
+<hr>
+<h2> Discussion </h2>
+
+<p> 
+<ul>
+<li>We use anchor box instead of original grid based approach, the anchor size is chosen using k-mean clustering, instead of hand picking.</li>
+<li>Fusing low level feature with high level feature.</li>
+<li>The low level feature is reshaped to be of the same size (down sample) as high level feature.</li> 
+<li>Multi scale training. Similar to data augmentation like random crop, make network robust against different object scales. Compared to random crop, this approach enables us to augment smaller size object more easily.</li>
+</ul>
+</p>
+
+<hr>
+<h2> Conclusions </h2>
+
+<p>
+The IKEA dataset is not a of a significant size and hence, the training set is not that effective as it would be for a larger dataset. Also, there were a lot of discrepancies and inconsistencies in the data and annotations which resulted in a less accurate prediction. The classes that were extracted from the annotations could not be generalized as there was ambiguity with respect to the object names and attributes. Overall, if the dataset and the annotations are refactored, better predictions can be obtained. Also, the YOLO petrained model does a reasonably effective job of predicting accurate objects even without a significant amount of train data.
+</p>
+
+
+<hr>
+<h2> Credits and Bibliography </h2>
+<p>
+<b>References:</b>
+<ul>
+	<li>http://www.cs.bu.edu/fac/betke/cs440/restricted/project/Project-instructions-CS640.html</li>
+	<li>http://labelme2.csail.mit.edu/Release3.0/index.php</li>
+	<li>http://www.cs.bu.edu/fac/betke/cs440/restricted/project/LabelMe-instructions-CS640.html</li>
+	<li>https://www.bu.edu/tech/support/research/computing-resources/scc/</li>
+	<li>https://pjreddie.com/darknet/yolo/</li>
+	<li>https://pjreddie.com/media/files/papers/YOLOv3.pdf</li>
+</ul>
+</p>
+<p>
+<b>Collaboration:</b>
+<ul>
+	<li>Collaborated with Gur Asees Chandok.</li>
+</ul>
+</p>
+<hr>
+</div>
+</body>
+
+
+</html>
